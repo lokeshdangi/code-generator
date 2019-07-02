@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 import "./App.css";
+import { Rnd } from "react-rnd";
 import { ReactGenerator } from "./components/codegenerator";
 
 let that;
@@ -32,6 +33,20 @@ const allowedCssPropertiesForContainer = [
   { paddingBottom: "number" }
 ];
 
+const flexPropertiesHorizontal = [
+  { label: "End", property: "flex-end" },
+  { label: "Start", property: "flex-start" },
+  { label: "Center", property: "center" },
+  { label: "Space between", property: "space-between" },
+  { label: "Space", property: "space-around" }
+];
+
+const flexPropertiesVertical = [
+  { label: "End", property: "flex-end" },
+  { label: "Start", property: "flex-start" },
+  { label: "Center", property: "center" }
+];
+
 export default class App extends Component {
   styles = {};
 
@@ -50,7 +65,9 @@ export default class App extends Component {
     paddingBottom: "",
     fontSize: "",
     height: "",
-    width: ""
+    width: "",
+    display: "",
+    flexDirection: ""
   };
 
   uidl = {
@@ -124,8 +141,8 @@ export default class App extends Component {
           elementType: TYPE,
           style: {
             height: "10px",
-            width: "100%",
-            backgroundColor: "blue",
+            width: "10px",
+            backgroundColor: getRandomColor(),
             marginTop: "5px"
           },
           children: []
@@ -171,15 +188,13 @@ export default class App extends Component {
       }
     }, this.uidl);
 
-    // console.log("AFTER UIDL: ", JSON.stringify(this.uidl));
     // const reactGenerator = new ReactGenerator();
 
     // reactGenerator.traverseUidl({
     //   name: "PersonSpotlight",
     //   node: this.uidl
     // });
-
-    // // console.log("element =>", reactGenerator.elements);
+    // console.log("element =>", reactGenerator.code);
     // this.setState({
     //   code: reactGenerator.elements,
     //   style: JSON.parse(JSON.stringify(reactGenerator.styleSheet))
@@ -194,6 +209,7 @@ export default class App extends Component {
     });
 
     document.getElementById(id).appendChild(node);
+    this.forceUpdate();
   };
 
   handleStyleChange = (event, data, isInPixel = false) => {
@@ -313,34 +329,104 @@ export default class App extends Component {
           <div
             style={{
               marginLeft: 10,
-              height: 500,
+              padding: 20,
               background: "#eeeeee"
             }}
           >
-            {this.state.currentElementType === "container" &&
-              allowedCssPropertiesForContainer.map(property => {
-                return (
-                  <React.Fragment>
-                    <label>{Object.keys(property)[0]}</label>
-                    <br />
-                    <input
-                      type={property[Object.keys(property)[0]]}
-                      value={this.state[Object.keys(property)[0]]}
-                      onChange={event =>
-                        this.handleStyleChange(
-                          event,
-                          Object.keys(property)[0],
-                          property[Object.keys(property)[0]] === "number"
-                            ? true
-                            : false
-                        )
-                      }
-                    />
-                    <br />
-                  </React.Fragment>
-                );
-              })}
+            {this.state.currentElementType === "container" && (
+              <React.Fragment>
+                <input
+                  type="checkbox"
+                  onChange={event => {
+                    event.target.checked
+                      ? setNewStyle({ display: "flex", flexDirection: "row" })
+                      : setNewStyle({
+                          display: "flex",
+                          flexDirection: "column"
+                        });
+                  }}
+                />
+                <label> Align children in row</label>
+                <br />
+                <br />
 
+                <label> Align Content Horizontal</label>
+                <br />
+                {flexPropertiesHorizontal.map(element => {
+                  return (
+                    <React.Fragment>
+                      <input
+                        name="flexPropHorizonal"
+                        type="radio"
+                        onChange={event => {
+                          event.target.checked
+                            ? setNewStyle({
+                                display: "flex",
+                                justifyContent: element["property"]
+                              })
+                            : setNewStyle({
+                                display: "flex",
+                                justifyContent: "flex-start"
+                              });
+                        }}
+                      />
+                      <label> {element["label"]}</label>
+                      <br />
+                    </React.Fragment>
+                  );
+                })}
+
+                <label> Align Content Vertical</label>
+                <br />
+                {flexPropertiesVertical.map(element => {
+                  return (
+                    <React.Fragment>
+                      <input
+                        name="flexPropVertical"
+                        type="radio"
+                        onChange={event => {
+                          event.target.checked
+                            ? setNewStyle({
+                                display: "flex",
+                                alignItems: element["property"]
+                              })
+                            : setNewStyle({
+                                display: "flex",
+                                alignItems: "flex-start"
+                              });
+                        }}
+                      />
+                      <label> {element["label"]}</label>
+                      <br />
+                    </React.Fragment>
+                  );
+                })}
+                <br />
+                <br />
+                {allowedCssPropertiesForContainer.map(property => {
+                  return (
+                    <div style={{ marginTop: 5 }}>
+                      <label>{Object.keys(property)[0]}</label>
+                      <br />
+                      <input
+                        type={property[Object.keys(property)[0]]}
+                        value={this.state[Object.keys(property)[0]]}
+                        onChange={event =>
+                          this.handleStyleChange(
+                            event,
+                            Object.keys(property)[0],
+                            property[Object.keys(property)[0]] === "number"
+                              ? true
+                              : false
+                          )
+                        }
+                      />
+                      <br />
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            )}
             {this.state.currentElementType === "text" &&
               allowedCssPropertiesForText.map(property => {
                 return (
@@ -404,20 +490,60 @@ const GenText = props => {
 const GenContainer = props => {
   let id = props.node.id;
   id = `container${id}`;
-  return (
-    <div
-      style={props.node.style}
-      id={id}
-      onClick={event => {
-        event.stopPropagation();
-        clearState();
-        setCurrentElementProperties(event.target.id.slice(9));
-        setCurrentElement(that, "container", event.target.id.slice(9));
-      }}
-    >
-      <Children node={props.node} />
-    </div>
-  );
+
+  if (props.node.id == "0") {
+    return (
+      <div
+        style={props.node.style}
+        id={id}
+        onClick={event => {
+          event.stopPropagation();
+          clearState();
+          setCurrentElementProperties(event.target.id.slice(9));
+          setCurrentElement(that, "container", event.target.id.slice(9));
+        }}
+      >
+        <Children node={props.node} />
+      </div>
+    );
+  } else {
+    return (
+      // <Rnd
+      //   size={{ width: that.state.width, height: that.state.height }}
+      //   maxWidth={350}
+      //   maxHeight={250}
+      //   onResize={(e, direction, ref, delta, position) => {
+      //     console.log(
+      //       "ref =>",
+      //       `W :${ref.style.width}   H :${ref.style.height}`
+      //     );
+
+      //     that.setState({
+      //       width: ref.style.width,
+      //       height: ref.style.height
+      //     });
+
+      //     setNewStyle({
+      //       width: ref.style.width,
+      //       height: ref.style.height
+      //     });
+      //   }}
+      // >
+      <div
+        style={props.node.style}
+        id={id}
+        onClick={event => {
+          event.stopPropagation();
+          clearState();
+          setCurrentElementProperties(event.target.id.slice(9));
+          setCurrentElement(that, "container", event.target.id.slice(9));
+        }}
+      >
+        <Children node={props.node} />
+      </div>
+      // </Rnd>
+    );
+  }
 };
 
 const GenComponentNodes = props => {
@@ -530,7 +656,6 @@ const setNewText = (event, text) => {
 };
 
 const clearState = () => {
-  console.log("clearning state");
   that.setState({
     backgroundColor: "",
     marginLeft: "",
@@ -545,4 +670,48 @@ const clearState = () => {
     height: "",
     width: ""
   });
+};
+
+const setNewStyle = data => {
+  let level = 0;
+  const id = that.state.currentElementId;
+  let path = [];
+  if (id.length > 1) {
+    path = id.split("_");
+  } else {
+    path = [id];
+  }
+
+  path.reduce((obj, key, index) => {
+    level++;
+    if (path.length === level) {
+      if (index === 0) {
+        return (obj["content"]["children"]["style"] = {
+          ...obj["content"]["children"]["style"],
+          ...data
+        });
+      } else {
+        return (obj["content"]["children"][key]["content"]["style"] = {
+          ...obj["content"]["children"][key]["content"]["style"],
+          ...data
+        });
+      }
+    } else {
+      if (index === 0) {
+        return obj;
+      } else {
+        return obj["content"]["children"][key];
+      }
+    }
+  }, that.uidl);
+  that.forceUpdate();
+};
+
+const getRandomColor = () => {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 };

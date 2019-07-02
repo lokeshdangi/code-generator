@@ -90,7 +90,7 @@ export class ReactGenerator {
       );
     }
 
-    const containerStartTemplate = `<div id="${id}" class="${className}">`;
+    const containerStartTemplate = `<div class="${className}">`;
     this.elements = `${this.elements}${containerStartTemplate}`;
     this.searchForChildren(node);
     const containerEndTemplate = `</div>`;
@@ -153,11 +153,10 @@ export class ReactGenerator {
 
     const stylesArr = [...styles];
     stylesArr.forEach((char, index) => {
-      // if (char === "-") {
-      //   stylesArr[index] = "";
-      //   stylesArr[index + 1] = stylesArr[index + 1].toUpperCase();
-      // } else
-      if (
+      if (char === "-") {
+        stylesArr[index] = "";
+        stylesArr[index + 1] = stylesArr[index + 1].toUpperCase();
+      } else if (
         char === '"' &&
         (styles[index - 1] === "{" || styles[index - 1] === ",")
       ) {
@@ -169,7 +168,7 @@ export class ReactGenerator {
       }
     });
 
-    const styleTemplate = `#${className}${stylesArr.join("")}`;
+    const styleTemplate = `.${className}${stylesArr.join("")}`;
     this.styleSheet = `${this.styleSheet}${styleTemplate}`;
   };
 
@@ -378,7 +377,7 @@ function App() {
 
   const reactCodeGen = new ReactGenerator();
   reactCodeGen.traverseUidl(uidl);
-  // console.log("generated code =>", reactCodeGen.code);
+  console.log("generated code =>", reactCodeGen.code);
   console.log("generated styles =>", reactCodeGen.styleSheet);
   const props = {};
   props.bio = "bio";
