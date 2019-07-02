@@ -17,6 +17,7 @@ const allowedCssPropertiesForText = [
   { paddingTop: "number" },
   { paddingBottom: "number" }
 ];
+
 const allowedCssPropertiesForContainer = [
   { backgroundColor: "text" },
   { height: "number" },
