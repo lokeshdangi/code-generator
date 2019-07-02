@@ -34,7 +34,6 @@ const allowedCssPropertiesForContainer = [
 
 export default class App extends Component {
   styles = {};
-  styleSheet = "";
 
   state = {
     currentElementId: 0,
