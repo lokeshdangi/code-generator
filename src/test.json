@@ -1,0 +1,29 @@
+{
+  "type": "element",
+  "id": "0",
+  "content": {
+    "elementType": "container",
+    "style": {},
+    "children": [
+      {
+        "type": "element",
+        "id": "0_0",
+        "content": {
+          "elementType": "container",
+          "style": { "backgroundColor": "pink" },
+          "children": []
+        }
+      },
+      {
+        "type": "element",
+        "id": "0_1",
+        "content": { "elementType": "container", "style": {}, "children": [] }
+      },
+      {
+        "type": "element",
+        "id": "0_2",
+        "content": { "elementType": "container", "style": {}, "children": [] }
+      }
+    ]
+  }
+}
