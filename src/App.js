@@ -79,8 +79,7 @@ export default class App extends Component {
       style: {
         backgroundColor: "red",
         height: "650px",
-        width: "350px",
-        position: "absolute"
+        width: "600px"
       },
       children: []
     }
@@ -140,10 +139,9 @@ export default class App extends Component {
           id: `${id}_${children.length}`,
           elementType: TYPE,
           style: {
-            height: "10px",
-            width: "10px",
-            backgroundColor: getRandomColor(),
-            marginTop: "5px"
+            height: "30px",
+            width: "30px",
+            backgroundColor: getRandomColor()
           },
           children: []
         }
@@ -317,9 +315,9 @@ export default class App extends Component {
               <div
                 id="0"
                 style={{
-                  marginLeft: 400,
+                  marginLeft: 10,
                   height: 500,
-                  width: 800,
+                  width: 300,
                   background: "#dddddd"
                 }}
               />
